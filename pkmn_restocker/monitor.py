@@ -1,4 +1,5 @@
 from pathlib import Path
+import argparse
 import asyncio
 import aiohttp
 from .config import Config
@@ -15,20 +16,22 @@ async def check_retailer(session, retailer_cfg, notifiers):
             n.send(message)
         print(message)
 
-async def main(config_path='config.yaml'):
+async def main(config_path='config.yaml', disable_notifications: bool = False):
     config = Config.load(Path(config_path))
     notifiers = []
-    if config.notifiers.discord_webhook:
-        notifiers.append(DiscordNotifier(config.notifiers.discord_webhook))
-    if config.notifiers.telegram_bot_token and config.notifiers.telegram_chat_id:
-        notifiers.append(TelegramNotifier(config.notifiers.telegram_bot_token, config.notifiers.telegram_chat_id))
+    if not disable_notifications:
+        if config.notifiers.discord_webhook:
+            notifiers.append(DiscordNotifier(config.notifiers.discord_webhook))
+        if config.notifiers.telegram_bot_token and config.notifiers.telegram_chat_id:
+            notifiers.append(TelegramNotifier(config.notifiers.telegram_bot_token, config.notifiers.telegram_chat_id))
 
     async with aiohttp.ClientSession() as session:
         tasks = [check_retailer(session, r, notifiers) for r in config.retailers]
         await asyncio.gather(*tasks)
 
 if __name__ == '__main__':
-    import sys
-    from pathlib import Path
-    path = sys.argv[1] if len(sys.argv) > 1 else 'config.yaml'
-    asyncio.run(main(path))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('config', nargs='?', default='config.yaml')
+    parser.add_argument('--disable-notifications', action='store_true', help='do not send messages')
+    args = parser.parse_args()
+    asyncio.run(main(args.config, disable_notifications=args.disable_notifications))
