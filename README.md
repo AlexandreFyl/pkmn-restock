@@ -16,6 +16,7 @@ This project monitors Pokemon card restocks on French retailer websites.
    ```bash
    python -m pkmn_restocker.monitor config.yaml
    ```
+   Use `--disable-notifications` to test without sending messages.
 
 ## Docker
 A `Dockerfile` and `docker-compose.yml` are provided for containerized deployment.

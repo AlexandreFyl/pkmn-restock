@@ -8,7 +8,7 @@ class ProductInfo:
     price: Optional[float]
     in_stock: bool
 
-def fetch_json(session, url):
+async def fetch_json(session, url):
     async with session.get(url, timeout=10) as resp:
         resp.raise_for_status()
         return await resp.json()
