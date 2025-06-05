@@ -1,0 +1,8 @@
+retailers:
+  - name: "Cultura Example"
+    url: "https://www.cultura.com/pokemon-product-example.html"
+    in_stock_text: "En stock"
+notifiers:
+  discord_webhook: ""
+  telegram_bot_token: ""
+  telegram_chat_id: ""
